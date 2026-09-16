@@ -28,12 +28,14 @@ export class AgentController {
   private isProcessing = false;
 
   /**
-   * Sends the redacted screen and DOM to the server to get the next action.
+   * Sends the redacted screen and DOM to the server (or local inference) to get the next action.
+   * Enforces Dynamic Policy decisions (Route: local_slm vs cloud_vlm).
    */
   async getNextAction(
     task: string,
     redactedScreenshot: string,
-    domSnapshot: DOMSnapshot
+    domSnapshot: DOMSnapshot,
+    policyDecision?: import('../types/policy').PolicyDecision
   ): Promise<AnalyzeResponse | null> {
     if (this.isProcessing) {
       console.warn('[VisionLite:Agent] Already processing, skipping cycle.');
@@ -41,7 +43,11 @@ export class AgentController {
     }
 
     this.isProcessing = true;
-    this.broadcastState(task, 'analyzing', undefined);
+    this.broadcastState(
+      task,
+      'analyzing',
+      policyDecision ? `Policy Route: ${policyDecision.executionRoute.toUpperCase()} | Profile: ${policyDecision.effectiveProfile}` : undefined
+    );
 
     try {
       const payload: AnalyzePayload = {

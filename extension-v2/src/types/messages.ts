@@ -194,6 +194,19 @@ export interface SidePanelChatMsg {
   message: string;
 }
 
+// ---- Policy Engine Messages ----
+
+export interface GetPolicyDecisionMsg {
+  type: 'GET_POLICY_DECISION';
+  url?: string;
+  task?: string;
+}
+
+export interface PolicyDecisionMsg {
+  type: 'POLICY_DECISION_UPDATE';
+  decision: import('./policy').PolicyDecision;
+}
+
 // ---- Union of all messages ----
 
 export type ExtensionMessage =
@@ -210,5 +223,8 @@ export type ExtensionMessage =
   | StatsUpdateMsg
   | PipelineStatusMsg
   | AgentStateUpdateMsg
-  | SidePanelChatMsg;
+  | SidePanelChatMsg
+  | GetPolicyDecisionMsg
+  | PolicyDecisionMsg;
+
 

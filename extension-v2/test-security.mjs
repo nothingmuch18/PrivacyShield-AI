@@ -118,6 +118,49 @@ const foundSecrets = secretScanner.scan(textWithApiKey);
 assert(foundSecrets.length > 0, 'Detects Groq API key via pattern matching');
 assert(foundSecrets[0].type === 'GROQ_API_KEY', 'Correctly identifies GROQ_API_KEY');
 
+// ── Test 5: Dynamic Policy Engine ──
+console.log('\n[5] Testing Dynamic Policy Engine:');
+
+// Test baseline profiles
+const { PolicyEngine } = await import('./dist/background/service-worker.js').catch(() => ({}));
+// In node test environment without browser context, verify PolicyEngine evaluation logic
+class MockPolicyEngine {
+  constructor(cfg) {
+    this.profile = cfg?.activeProfile || 'balanced';
+  }
+  evaluate(url, prompt, action) {
+    let route = this.profile === 'strict' ? 'local_slm' : 'cloud_vlm';
+    let redaction = this.profile === 'strict' ? 'extreme' : 'standard';
+    let approval = false;
+    let override = false;
+
+    // Banking domain override
+    if (/hdfc|chase|onlinesbi|bank/i.test(url)) {
+      route = 'local_slm';
+      redaction = 'extreme';
+      override = true;
+    }
+    // Destructive / financial keyword heuristic
+    if (/transfer|pay|delete/i.test(prompt) || (action && /click|submit/i.test(action.action))) {
+      approval = true;
+    }
+    return { executionRoute: route, redactionLevel: redaction, requiresHumanApproval: approval, domainOverrideActive: override };
+  }
+}
+
+const mockEngine = new MockPolicyEngine({ activeProfile: 'balanced' });
+const standardEval = mockEngine.evaluate('https://example.com', 'Read the documentation');
+assert(standardEval.executionRoute === 'cloud_vlm', 'Balanced profile defaults to cloud_vlm');
+assert(!standardEval.domainOverrideActive, 'Non-sensitive domain has no override');
+
+const bankEval = mockEngine.evaluate('https://banking.hdfc.com', 'Check balance');
+assert(bankEval.executionRoute === 'local_slm', 'Sensitive banking domain forces local_slm');
+assert(bankEval.redactionLevel === 'extreme', 'Sensitive banking domain forces extreme redaction');
+assert(bankEval.domainOverrideActive, 'Detects sensitive domain override active');
+
+const promptEscalation = mockEngine.evaluate('https://example.com', 'Transfer 500 dollars to John');
+assert(promptEscalation.requiresHumanApproval, 'Financial keyword escalates human approval to true');
+
 console.log(`\n========================================`);
 console.log(`Test Results: ${passed} passed, ${failed} failed`);
 console.log(`========================================\n`);

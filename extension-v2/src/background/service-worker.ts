@@ -23,8 +23,11 @@ import type {
 } from '../types/messages';
 import { AgentController } from './agent-controller';
 import { ActionValidator } from '../core/action-validator';
+import { PolicyEngine } from '../services/PolicyEngine';
 
 const actionValidator = new ActionValidator();
+export const policyEngine = new PolicyEngine();
+policyEngine.init();
 
 // ════════════════════════════════════════════════════════════════
 //  STATE
@@ -250,19 +253,33 @@ chrome.runtime.onMessage.addListener(
       };
       chrome.runtime.sendMessage(statsMsg).catch(() => {});
 
-      // Step 5: Send redacted screenshot + DOM to FastAPI server
+      // Step 5: Evaluate Context with Dynamic Policy Engine before LLM reasoning
       if (currentTask) {
         const domSnapshot = pendingDOMSnapshots.get(cycleIndex);
         pendingDOMSnapshots.delete(cycleIndex);
 
         if (domSnapshot) {
-          agent.getNextAction(currentTask, result.redactedScreenshot, domSnapshot).then((actionResponse) => {
+          const pageUrl = domSnapshot.url || '';
+          // ── POLICY INTERCEPTION 1: Pre-inference Route & Redaction check ──
+          const policyDecision = policyEngine.evaluateContext(pageUrl, currentTask);
+          console.log(`[VisionLite:Policy] Decision for ${pageUrl}:`, policyDecision);
+
+          // Broadcast policy status to UI
+          chrome.runtime.sendMessage({
+            type: 'POLICY_DECISION_UPDATE',
+            decision: policyDecision,
+          }).catch(() => {});
+
+          agent.getNextAction(currentTask, result.redactedScreenshot, domSnapshot, policyDecision).then((actionResponse) => {
             if (actionResponse && actionResponse.action) {
               if (actionResponse.action.action === 'done') {
                 console.log('[VisionLite] AI signaled task is DONE.');
                 stopPipeline();
               } else {
-                // Validate action before execution
+                // ── POLICY INTERCEPTION 2: Pre-execution Action & Human-in-the-Loop check ──
+                const postActionPolicy = policyEngine.evaluateContext(pageUrl, currentTask, actionResponse.action);
+
+                // Validate action structure and security boundaries
                 const validation = actionValidator.validate(actionResponse.action);
                 if (!validation.allowed) {
                   console.warn('[VisionLite] Action blocked by validator:', validation.reason);
@@ -270,15 +287,18 @@ chrome.runtime.onMessage.addListener(
                   return;
                 }
 
-                if (validation.requiresConfirmation) {
-                  console.warn(`[VisionLite] High-risk action (${validation.riskLevel}) requires user confirmation:`, validation.reason);
+                const requiresApproval = validation.requiresConfirmation || postActionPolicy.requiresHumanApproval;
+
+                if (requiresApproval) {
+                  const policyReasons = postActionPolicy.reasons.join('; ');
+                  console.warn(`[VisionLite] Action requires human approval under dynamic policy:`, policyReasons);
                   agent.broadcastState(
                     currentTask,
                     'executing',
-                    `Action gated behind security review: ${validation.reason}`,
-                    `[Requires Confirmation: ${validation.riskLevel}] ${actionResponse.action.action} ${actionResponse.action.target || ''}`
+                    `Action gated by Policy Engine: ${policyReasons}`,
+                    `[Requires Approval: ${postActionPolicy.effectiveProfile.toUpperCase()}] ${actionResponse.action.action} ${actionResponse.action.target || ''}`
                   );
-                  // For high/critical risk actions, do not blindly execute
+                  // Human approval required — do not blindly execute
                   return;
                 }
 
@@ -301,6 +321,17 @@ chrome.runtime.onMessage.addListener(
       }
 
       return false;
+    }
+
+    // ---- Policy Engine: Request active context evaluation ----
+    if (message.type === 'GET_POLICY_DECISION') {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const url = message.url || tabs[0]?.url || '';
+        const task = message.task || currentTask || '';
+        const decision = policyEngine.evaluateContext(url, task);
+        sendResponse({ decision });
+      });
+      return true;
     }
 
     // ---- From Content Script: capture request (legacy compat) ----

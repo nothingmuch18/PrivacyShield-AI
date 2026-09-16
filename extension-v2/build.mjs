@@ -26,6 +26,7 @@ const ENTRY_POINTS = [
   'src/offscreen/offscreen.ts',
   'src/sidepanel/sidepanel.ts',
   'src/debug/debug.ts',
+  'src/options/options.ts',
 ];
 
 const STATIC_FILES = [
@@ -37,6 +38,7 @@ const STATIC_FILES = [
   ['src/sidepanel/sidepanel.html', 'dist/sidepanel/sidepanel.html'],
   ['src/sidepanel/sidepanel.css', 'dist/sidepanel/sidepanel.css'],
   ['src/debug/debug.html', 'dist/debug/debug.html'],
+  ['src/options/options.html', 'dist/options/options.html'],
   
   // Tesseract.js Assets
   ['node_modules/tesseract.js/dist/worker.min.js', 'dist/lib/worker.min.js'],

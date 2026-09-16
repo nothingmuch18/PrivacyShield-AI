@@ -72,6 +72,15 @@
       <span class="pipeline-label" id="pipelineLabel">Processing...</span>
     </div>
 
+    <!-- Active Policy Badge -->
+    <div id="popupPolicyBadge" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 8px; font-size: 11px;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span id="popupPolicyIcon">🛡️</span>
+        <span id="popupPolicyText" style="font-weight: 600; color: #a5b4fc;">Policy: Balanced</span>
+      </div>
+      <button id="openOptionsBtn" title="Open Dynamic Policy Settings" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 12px; padding: 2px 4px;">⚙️ Edit</button>
+    </div>
+
     <!-- Quick Navigation to Dashboard & Inspector -->
     <div class="dashboard-actions" style="display: flex; gap: 8px; margin-top: 2px;">
       <button id="openSidepanelBtn" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; background: linear-gradient(135deg, #4f46e5, #7c3aed); border: none; border-radius: 8px; color: white; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s;">

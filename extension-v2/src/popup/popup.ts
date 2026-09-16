@@ -108,6 +108,56 @@ if (openDebugBtn) {
   });
 }
 
+// Open Dynamic Policy Engine Settings
+const openOptionsBtn = $('openOptionsBtn');
+if (openOptionsBtn) {
+  openOptionsBtn.addEventListener('click', () => {
+    if (chrome.runtime.openOptionsPage) {
+      chrome.runtime.openOptionsPage();
+    } else {
+      chrome.tabs.create({ url: chrome.runtime.getURL('options/options.html') });
+    }
+  });
+}
+
+// Check live policy context for current active tab
+function refreshPopupPolicy(): void {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const url = tabs[0]?.url || '';
+    chrome.runtime.sendMessage({ type: 'GET_POLICY_DECISION', url }, (res) => {
+      if (res?.decision) {
+        updatePopupPolicyUI(res.decision);
+      }
+    });
+  });
+}
+
+function updatePopupPolicyUI(decision: any): void {
+  const iconEl = $('popupPolicyIcon');
+  const textEl = $('popupPolicyText');
+  if (!iconEl || !textEl) return;
+
+  if (decision.domainOverrideActive) {
+    iconEl.textContent = '🚨';
+    textEl.textContent = 'Policy: Strict (Override)';
+    textEl.style.color = '#ef4444';
+  } else if (decision.effectiveProfile === 'strict') {
+    iconEl.textContent = '🔒';
+    textEl.textContent = 'Policy: Strict (Local SLM)';
+    textEl.style.color = '#f87171';
+  } else if (decision.effectiveProfile === 'performance') {
+    iconEl.textContent = '⚡';
+    textEl.textContent = 'Policy: Speed (Cloud)';
+    textEl.style.color = '#38bdf8';
+  } else {
+    iconEl.textContent = '🛡️';
+    textEl.textContent = 'Policy: Balanced';
+    textEl.style.color = '#a5b4fc';
+  }
+}
+
+refreshPopupPolicy();
+
 // ════════════════════════════════════════════════════════════════
 //  MESSAGE LISTENER (stats from background)
 // ════════════════════════════════════════════════════════════════
