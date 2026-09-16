@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VisionLite AI — Offscreen ML Engine</title>
+</head>
+<body>
+  <!--
+    This is an offscreen document (Manifest V3).
+    It provides DOM/Canvas access that service workers lack.
+    
+    Currently: Mock PII detection + canvas redaction
+    Future:    ONNX Runtime Web (YOLO), Tesseract.js, MediaPipe Face Detection
+  -->
+  <canvas id="processingCanvas" style="display:none;"></canvas>
+  <script src="offscreen.js"></script>
+</body>
+</html>
+

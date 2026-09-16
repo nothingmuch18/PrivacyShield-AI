@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PrivacyShield AI — Dashboard</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="dashboard">
+
+    <!-- ======== TOP BAR ======== -->
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <span class="top-logo-icon">🛡️</span>
+        <span class="top-logo-text">PrivacyShield <span class="accent">AI</span></span>
+      </div>
+      <div class="top-bar-right">
+        <button id="btnToggleOverlay" class="btn-pause" title="Toggle On-Screen Borders (Ctrl+Shift+D)" style="opacity: 0.5;">👁️</button>
+        <button id="btnPauseAgent" class="btn-pause" title="Pause Agent Actions">⏸️</button>
+        <span class="elapsed-time" id="elapsedTime">00:00</span>
+        <span class="status-dot-live" id="statusDotLive"></span>
+      </div>
+    </header>
+
+    <!-- Active Task Banner -->
+    <div class="task-banner" id="taskBanner" style="display:none;">
+      <span class="task-banner-icon">🎯</span>
+      <span class="task-banner-text" id="taskBannerText"></span>
+    </div>
+
+    <!-- Action Preview Banner -->
+    <div class="action-preview-banner" id="actionPreview" style="display:none;">
+      <div class="action-preview-content">
+        <span class="action-preview-icon">🤖</span>
+        <span class="action-preview-text" id="actionPreviewText">Next action: ...</span>
+      </div>
+      <div class="action-preview-actions">
+        <button id="btnCancelAction" class="btn-cancel">Cancel</button>
+        <button id="btnConfirmAction" class="btn-confirm" style="display:none;">Confirm</button>
+      </div>
+      <div class="action-preview-progress" id="actionPreviewProgress"></div>
+    </div>
+
+    <!-- ======== PLAN PROGRESS ======== -->
+    <section class="plan-progress-section" id="planProgressSection" style="display:none;">
+      <div class="plan-progress-header">
+        <div class="plan-progress-title">
+          <span class="plan-icon">🗺️</span>
+          <span>Plan Progress</span>
+        </div>
+        <div class="plan-progress-badge" id="planStepBadge">Step 0 of 0</div>
+      </div>
+      
+      <div class="plan-progress-bar-container">
+        <div class="plan-progress-bar-fill" id="planProgressBarFill" style="width: 0%;"></div>
+      </div>
+
+      <div class="plan-steps-list" id="planStepsList">
+        <!-- Steps rendered dynamically -->
+      </div>
+    </section>
+
+
+    <!-- ======== HERO METRICS ======== -->
+    <section class="hero-metrics" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+      <div class="metric-card metric-protected">
+        <div class="metric-icon">🛡️</div>
+        <div class="metric-value" id="metricProtected">0</div>
+        <div class="metric-label">Protected</div>
+      </div>
+      <div class="metric-card metric-detected">
+        <div class="metric-icon">👁️</div>
+        <div class="metric-value" id="metricDetected">0</div>
+        <div class="metric-label">Detected</div>
+      </div>
+      <div class="metric-card metric-precision" style="border-top-color: #3b82f6;">
+        <div class="metric-icon">🎯</div>
+        <div class="metric-value" id="metricPrecision">98%</div>
+        <div class="metric-label">Precision</div>
+      </div>
+      <div class="metric-card metric-recall" style="border-top-color: #8b5cf6;">
+        <div class="metric-icon">🔄</div>
+        <div class="metric-value" id="metricRecall">95%</div>
+        <div class="metric-label">Recall</div>
+      </div>
+      <div class="metric-card metric-latency">
+        <div class="metric-icon">⚡</div>
+        <div class="metric-value" id="metricLatency">--</div>
+        <div class="metric-label">ms</div>
+      </div>
+    </section>
+
+    <!-- ======== BEFORE / AFTER ======== -->
+    <section class="comparison-section">
+      <h3 class="section-title">Privacy Comparison</h3>
+      <div class="comparison-grid">
+        <div class="comparison-card">
+          <div class="comparison-header">
+            <span class="comparison-icon">🔒</span>
+            <span>Original <span class="tag-local">(Local Only)</span></span>
+          </div>
+          <div class="comparison-image-wrapper">
+            <img id="imgOriginal" class="comparison-img" src="" alt="Original screenshot">
+            <div class="no-image-placeholder" id="placeholderOriginal">
+              <span>Waiting for capture...</span>
+            </div>
+          </div>
+        </div>
+        <div class="comparison-card">
+          <div class="comparison-header">
+            <span class="comparison-icon">📤</span>
+            <span>Server View <span class="tag-safe">(Sanitized)</span></span>
+          </div>
+          <div class="comparison-image-wrapper">
+            <img id="imgRedacted" class="comparison-img" src="" alt="Redacted screenshot">
+            <div class="no-image-placeholder" id="placeholderRedacted">
+              <span>Waiting for redaction...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== DETECTION FEED ======== -->
+    <section class="feed-section">
+      <h3 class="section-title">Detection Feed</h3>
+      <div class="feed-list" id="feedList">
+        <div class="feed-empty">No detections yet. Enable the extension to start.</div>
+      </div>
+    </section>
+
+    <!-- ======== PERFORMANCE ======== -->
+    <section class="performance-section">
+      <h3 class="section-title">Performance</h3>
+      <div class="gauges-grid">
+        <div class="gauge-item">
+          <svg class="gauge-svg" viewBox="0 0 60 60">
+            <circle class="gauge-bg" cx="30" cy="30" r="25" />
+            <circle class="gauge-fill" id="gaugeCPU" cx="30" cy="30" r="25"
+              stroke-dasharray="157" stroke-dashoffset="157" />
+          </svg>
+          <div class="gauge-value" id="gaugeCPUVal">--%</div>
+          <div class="gauge-label">CPU</div>
+        </div>
+        <div class="gauge-item">
+          <svg class="gauge-svg" viewBox="0 0 60 60">
+            <circle class="gauge-bg" cx="30" cy="30" r="25" />
+            <circle class="gauge-fill gauge-fill-cyan" id="gaugeMem" cx="30" cy="30" r="25"
+              stroke-dasharray="157" stroke-dashoffset="157" />
+          </svg>
+          <div class="gauge-value" id="gaugeMemVal">--MB</div>
+          <div class="gauge-label">Memory</div>
+        </div>
+        <div class="gauge-item">
+          <svg class="gauge-svg" viewBox="0 0 60 60">
+            <circle class="gauge-bg" cx="30" cy="30" r="25" />
+            <circle class="gauge-fill gauge-fill-amber" id="gaugeGPU" cx="30" cy="30" r="25"
+              stroke-dasharray="157" stroke-dashoffset="157" />
+          </svg>
+          <div class="gauge-value" id="gaugeGPUVal">N/A</div>
+          <div class="gauge-label">GPU</div>
+        </div>
+        <div class="gauge-item">
+          <svg class="gauge-svg" viewBox="0 0 60 60">
+            <circle class="gauge-bg" cx="30" cy="30" r="25" />
+            <circle class="gauge-fill gauge-fill-green" id="gaugeFPS" cx="30" cy="30" r="25"
+              stroke-dasharray="157" stroke-dashoffset="157" />
+          </svg>
+          <div class="gauge-value" id="gaugeFPSVal">--</div>
+          <div class="gauge-label">FPS</div>
+        </div>
+      </div>
+
+      <!-- Pipeline Breakdown -->
+      <div class="pipeline-bar">
+        <div class="pipeline-segment seg-capture" id="segCapture" title="Capture">
+          <span>Cap</span>
+        </div>
+        <div class="pipeline-segment seg-detect" id="segDetect" title="Detection">
+          <span>Det</span>
+        </div>
+        <div class="pipeline-segment seg-ocr" id="segOCR" title="OCR">
+          <span>OCR</span>
+        </div>
+        <div class="pipeline-segment seg-pii" id="segPII" title="PII Scan">
+          <span>PII</span>
+        </div>
+        <div class="pipeline-segment seg-redact" id="segRedact" title="Redact">
+          <span>Red</span>
+        </div>
+        <div class="pipeline-segment seg-server" id="segServer" title="Server">
+          <span>Srv</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== AGENT LOG ======== -->
+    <section class="agent-section">
+      <h3 class="section-title">Agent Actions</h3>
+      <div class="agent-log" id="agentLog">
+        <div class="feed-empty">No actions received from server yet.</div>
+      </div>
+    </section>
+
+    <!-- ======== MODEL STATUS ======== -->
+    <section class="model-section">
+      <h3 class="section-title">Models</h3>
+      <div class="model-status-list">
+        <div class="model-item">
+          <span class="model-name">Face Detection</span>
+          <span class="model-badge" id="modelDetection">Loading...</span>
+        </div>
+        <div class="model-item">
+          <span class="model-name">OCR Engine</span>
+          <span class="model-badge" id="modelOCR">Loading...</span>
+        </div>
+        <div class="model-item">
+          <span class="model-name">Server VLM</span>
+          <span class="model-badge" id="modelServer">Offline</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== FOOTER ======== -->
+    <footer class="dashboard-footer">
+      <span class="footer-tech">WebGPU + ONNX Runtime</span>
+      <span class="footer-sep">•</span>
+      <span class="footer-privacy" id="footerPrivacy">Privacy: ACTIVE</span>
+    </footer>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

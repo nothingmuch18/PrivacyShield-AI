@@ -1,0 +1,60 @@
+name: PrivacyShield AI — CI Pipeline & Security Gate
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  extension-checks:
+    name: Extension Typecheck, Build & Privacy Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'extension-v2/package.json'
+
+      - name: Install Extension Dependencies
+        working-directory: ./extension-v2
+        run: npm ci || npm install
+
+      - name: Typecheck TypeScript
+        working-directory: ./extension-v2
+        run: npm run typecheck
+
+      - name: Build Extension (Manifest V3 Bundles)
+        working-directory: ./extension-v2
+        run: npm run build
+
+      - name: Run Privacy & Security Regression Tests
+        working-directory: ./extension-v2
+        run: npm test
+
+  backend-checks:
+    name: Backend Lint & Dependency Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'server/requirements.txt'
+
+      - name: Install Backend Dependencies
+        working-directory: ./server
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt

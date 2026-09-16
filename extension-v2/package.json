@@ -1,0 +1,22 @@
+{
+  "name": "VisionLite-ai",
+  "version": "2.0.0",
+  "private": true,
+  "description": "On-device Visual Perception for Light-weight Browser Agents (SIH 26171)",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs --watch",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "typecheck": "tsc --noEmit",
+    "test": "node build-test.mjs && node test-security.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "tesseract.js": "^7.0.0"
+  }
+}
+

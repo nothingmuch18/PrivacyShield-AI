@@ -1,0 +1,45 @@
+# ────────────────────────────────────────────
+# PrivacyShield AI — Root .gitignore
+# ────────────────────────────────────────────
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+venv/
+.venv/
+*.whl
+chroma_db/
+
+# Node
+node_modules/
+dist/
+dist-test/
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts
+*.zip
+*.tar.gz
+
+# Logs
+*.log

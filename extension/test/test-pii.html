@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PII Detector Tests</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; background: #f8fafc; color: #334155; }
+    h1 { color: #0f172a; }
+    .test-case { background: white; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .test-input { font-family: monospace; background: #f1f5f9; padding: 8px; border-radius: 4px; margin: 8px 0; }
+    .status { font-weight: bold; padding: 4px 8px; border-radius: 4px; display: inline-block; }
+    .pass { background: #dcfce7; color: #166534; }
+    .fail { background: #fee2e2; color: #991b1b; }
+    .results { margin-top: 8px; font-size: 14px; color: #64748b; }
+  </style>
+</head>
+<body>
+
+  <h1>PII Detector Tests</h1>
+  <div id="results"></div>
+
+  <!-- Load the PII Detector script -->
+  <script src="../utils/pii-detector.js"></script>
+  
+  <script>
+    const testCases = [
+      {
+        input: "My Aadhaar is 4832 7591 6045",
+        expectedType: "aadhaar"
+      },
+      {
+        input: "Email me at test@gmail.com",
+        expectedType: "email"
+      },
+      {
+        input: "Call +91 98765 43210",
+        expectedType: "indian_phone"
+      },
+      {
+        input: "PAN: BKRPS4523F",
+        expectedType: "pan"
+      },
+      {
+        input: "No PII in this text",
+        expectedType: null
+      },
+      {
+        input: "Edge case fake Aadhaar 1234 5678 9012", // Starts with 1, shouldn't match Aadhaar which starts with 2-9
+        expectedType: null
+      },
+      {
+        input: "Partial pan BKRP4523F", // missing a letter
+        expectedType: null
+      }
+    ];
+
+    const resultsContainer = document.getElementById('results');
+
+    function runTests() {
+      if (!window.PIIDetector) {
+        resultsContainer.innerHTML = '<div class="test-case fail">Failed to load PIIDetector.js</div>';
+        return;
+      }
+
+      let passed = 0;
+
+      testCases.forEach((tc, index) => {
+        // Run the detector (passing empty array for DOM elements since we're testing text extraction)
+        const detections = window.PIIDetector.detectPII(tc.input, []);
+        
+        let isPass = false;
+        let foundTypes = detections.map(d => d.type);
+
+        if (tc.expectedType === null) {
+          isPass = detections.length === 0;
+        } else {
+          isPass = foundTypes.includes(tc.expectedType);
+        }
+
+        if (isPass) passed++;
+
+        const testEl = document.createElement('div');
+        testEl.className = 'test-case';
+        testEl.innerHTML = `
+          <div><strong>Test #${index + 1}</strong> <span class="status ${isPass ? 'pass' : 'fail'}">${isPass ? 'PASS' : 'FAIL'}</span></div>
+          <div class="test-input">"${tc.input}"</div>
+          <div class="results">
+            Expected: <strong>${tc.expectedType || 'None'}</strong><br>
+            Detected: <strong>${detections.length > 0 ? foundTypes.join(', ') : 'None'}</strong>
+          </div>
+        `;
+        resultsContainer.appendChild(testEl);
+      });
+
+      const summary = document.createElement('h3');
+      summary.textContent = `Summary: ${passed} / ${testCases.length} Passed`;
+      resultsContainer.prepend(summary);
+    }
+
+    // Run tests on load
+    runTests();
+  </script>
+</body>
+</html>

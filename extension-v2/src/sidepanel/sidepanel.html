@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PrivacyShield AI — Agent</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="sidepanel-container">
+    
+    <!-- Header -->
+    <header class="panel-header">
+      <div class="logo-section">
+        <span class="logo-icon">🛡️</span>
+        <h1 class="logo-text">PrivacyShield <span class="logo-accent">AI</span></h1>
+      </div>
+      <div class="header-actions">
+        <button id="clearChatBtn" class="icon-btn" title="Clear Chat">🗑️</button>
+      </div>
+    </header>
+
+    <!-- Goal Section -->
+    <div class="goal-section" id="goalSection">
+      <div class="goal-label">Current Goal</div>
+      <div class="goal-text" id="goalText">Waiting for task...</div>
+      <div class="goal-status" id="goalStatus">
+        <span class="status-dot"></span>
+        <span class="status-text" id="statusText">Idle</span>
+      </div>
+    </div>
+
+    <!-- Metrics Overlay -->
+    <div class="metrics-overlay" id="metricsOverlay" style="background-color: #1a1a2e; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 0.75rem 1rem; display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #a0aec0;">
+      <div class="metric">
+        <span style="display:block; font-size:0.6rem; text-transform:uppercase; color:#718096; margin-bottom:2px;">Privacy Score</span>
+        <span id="metricPrivacyScore" style="color:#38bdf8; font-weight:bold;">100% (A+)</span>
+      </div>
+      <div class="metric">
+        <span style="display:block; font-size:0.6rem; text-transform:uppercase; color:#718096; margin-bottom:2px;">Local Inference</span>
+        <span id="metricInference" style="color:#68d391; font-weight:bold;">-- ms</span>
+      </div>
+      <div class="metric">
+        <span style="display:block; font-size:0.6rem; text-transform:uppercase; color:#718096; margin-bottom:2px;">PII Protected</span>
+        <span id="metricPii" style="color:#fc8181; font-weight:bold;">0 items</span>
+      </div>
+      <div class="metric">
+        <span style="display:block; font-size:0.6rem; text-transform:uppercase; color:#718096; margin-bottom:2px;">Privacy Gate</span>
+        <span id="metricGate" style="color:#a78bfa; font-weight:bold;">ACTIVE</span>
+      </div>
+    </div>
+
+    <!-- Main Chat/Log Area -->
+    <main class="chat-area" id="chatArea">
+      <div class="message system-message">
+        <div class="message-content">
+          <p>👋 Hello! I am your privacy-preserving AI assistant. Your data is protected locally.</p>
+          <p>Enter a goal below to begin.</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Input Area -->
+    <footer class="input-area">
+      <div class="input-wrapper">
+        <textarea id="chatInput" placeholder="What would you like me to do?" rows="1"></textarea>
+        <button id="sendBtn" class="send-btn" title="Send (Enter)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+      <div class="input-footer">
+        <span class="privacy-badge">🔒 On-Device Processing Active</span>
+      </div>
+    </footer>
+
+  </div>
+  <script src="sidepanel.js"></script>
+</body>
+</html>
+

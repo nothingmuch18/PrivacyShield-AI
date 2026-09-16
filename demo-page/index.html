@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DigiServices Portal (DEMO)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Demo Warning Banner -->
+  <div class="demo-warning">
+    ⚠️ This is a DEMO page with FAKE data for PrivacyShield AI testing. Do not enter real information.
+  </div>
+
+  <!-- Header -->
+  <header class="gov-header">
+    <div class="header-content">
+      <div class="logo-area">
+        <div class="emblem-placeholder">🏛️</div>
+        <div>
+          <h1 class="portal-title">DigiServices Portal</h1>
+          <p class="portal-subtitle">Government of India (Demo Environment)</p>
+        </div>
+      </div>
+      <div class="user-menu">
+        <span>Welcome, <b id="headerName">User</b></span>
+        <button class="btn btn-outline">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <ul class="nav-links">
+        <li class="active"><a href="#">Dashboard</a></li>
+        <li><a href="#">My Documents</a></li>
+        <li><a href="#">Update Profile</a></li>
+        <li><a href="#">Linked Services</a></li>
+      </ul>
+
+      <div class="notifications-panel">
+        <h3>Recent Alerts</h3>
+        <div class="alert-item">
+          <span class="alert-date">12 Aug 2026</span>
+          <p>Aadhaar update request for <b>Priya Sharma</b> approved.</p>
+        </div>
+        <div class="alert-item">
+          <span class="alert-date">05 Aug 2026</span>
+          <p>Login detected from new IP address.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      
+      <!-- Profile Section -->
+      <section class="card profile-section">
+        <h2>Citizen Profile</h2>
+        <div class="profile-grid">
+          <div class="profile-image-container">
+            <!-- PII: Face Image -->
+            <img id="profileImage" class="profile-image" src="" alt="Profile Photo">
+            <button class="btn btn-small">Update Photo</button>
+          </div>
+          <div class="profile-details">
+            <!-- PII: Personal details -->
+            <div class="detail-row">
+              <span class="detail-label">Full Name:</span>
+              <span class="detail-value" id="profileName">Loading...</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Aadhaar Number:</span>
+              <span class="detail-value highlight-pii" id="profileAadhaar">Loading...</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">PAN Number:</span>
+              <span class="detail-value highlight-pii" id="profilePan">Loading...</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Date of Birth:</span>
+              <span class="detail-value" id="profileDob">Loading...</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Mobile Number:</span>
+              <span class="detail-value" id="profilePhone">Loading...</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Email ID:</span>
+              <span class="detail-value" id="profileEmail">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Documents Table -->
+      <section class="card documents-section">
+        <h2>My Linked Documents</h2>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Document Type</th>
+              <th>ID Number</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="documentsTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Update Form -->
+      <section class="card form-section">
+        <h2>Update Contact Details</h2>
+        <p class="help-text">Please review and update your information below. OTP will be sent to registered mobile.</p>
+        
+        <form id="updateForm" class="gov-form" onsubmit="event.preventDefault();">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputName">Full Name</label>
+              <!-- PII: Name input -->
+              <input type="text" id="inputName" name="fullName" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="inputDob">Date of Birth</label>
+              <!-- PII: DOB input -->
+              <input type="text" id="inputDob" name="dob" class="form-control" placeholder="DD/MM/YYYY">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputEmail">Email Address</label>
+              <!-- PII: Email input -->
+              <input type="email" id="inputEmail" name="email" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="inputPhone">Mobile Number</label>
+              <!-- PII: Phone input -->
+              <input type="tel" id="inputPhone" name="indian_phone" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="inputAddress">Current Address</label>
+            <!-- PII: Address input -->
+            <textarea id="inputAddress" name="address" class="form-control" rows="3"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputAadhaar">Aadhaar verification</label>
+              <!-- PII: Aadhaar input -->
+              <input type="text" id="inputAadhaar" name="aadhaar" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="inputPassword">Portal PIN/Password</label>
+              <!-- PII: Password input -->
+              <input type="password" id="inputPassword" name="password" class="form-control" value="secret123">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" id="submitBtn" class="btn btn-primary">Save & Generate OTP</button>
+            <button type="button" class="btn btn-outline">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Family Members (Secondary faces) -->
+      <section class="card family-section">
+        <h2>Linked Family Members</h2>
+        <div class="family-list">
+          <div class="family-member">
+            <!-- PII: Secondary face image -->
+            <img id="familyImage" class="member-image" src="" alt="Family Member">
+            <div class="member-details">
+              <h4>Priya Sharma</h4>
+              <p>Wife • Aadhaar: 1293 8475 9932</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="fake-data.js"></script>
+</body>
+</html>

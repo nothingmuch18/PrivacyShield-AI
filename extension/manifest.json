@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "PrivacyShield AI",
+  "description": "On-device visual perception with privacy-preserving PII detection for browser agents",
+  "version": "1.0.0",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["utils/manifest-builder.js", "utils/dom-reader.js", "utils/pii-detector.js", "utils/redactor.js", "utils/agent-controller.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "sidePanel",
+    "tabCapture",
+    "notifications"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "web_accessible_resources": [
+    {
+      "resources": ["workers/*", "icons/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

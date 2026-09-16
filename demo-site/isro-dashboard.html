@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISRO Payload Procurement System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f4f8; }
+    .header-bar { background-color: #1a365d; color: white; border-bottom: 4px solid #f6ad55; }
+    .card { background: white; border-top: 4px solid #2b6cb0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+  </style>
+</head>
+<body>
+  
+  <header class="header-bar p-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="text-3xl font-bold tracking-widest text-orange-400">ISRO</div>
+      <div class="text-xl">| Payload Procurement System</div>
+    </div>
+    <div class="text-sm font-mono">USER: PR-AUTH-0492 | SESSION: SECURE</div>
+  </header>
+
+  <main class="max-w-5xl mx-auto mt-8 p-4">
+    
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Pending Approvals</h1>
+      <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">1 URGENT</span>
+    </div>
+
+    <div class="card rounded p-6">
+      <div class="border-b pb-4 mb-4 flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-bold text-gray-900">Purchase Order: Telemetry Sensors (X-Band)</h2>
+          <p class="text-sm text-gray-500">Ref: PO-2026-88349</p>
+        </div>
+        <div class="text-right">
+          <div class="text-sm text-gray-500">Total Value</div>
+          <div class="text-2xl font-bold text-gray-900">₹ 84,50,000</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-8 mb-8">
+        
+        <!-- Left: Vendor Details -->
+        <div class="space-y-4 bg-gray-50 p-4 rounded border">
+          <h3 class="font-bold text-gray-700 uppercase text-sm">Vendor Details</h3>
+          <div>
+            <div class="text-xs text-gray-500">Vendor Name</div>
+            <div class="font-medium text-gray-900">AeroSpace Dynamics Ltd.</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500">Bank Account Number</div>
+            <div class="font-mono text-lg font-bold text-blue-800">994018273645</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500">IFSC / Routing</div>
+            <div class="font-mono text-gray-900">SBIN0004567</div>
+          </div>
+        </div>
+
+        <!-- Right: Internal Details -->
+        <div class="space-y-4 bg-gray-50 p-4 rounded border">
+          <h3 class="font-bold text-gray-700 uppercase text-sm">Internal Allocation</h3>
+          <div>
+            <div class="text-xs text-gray-500">Mission Target</div>
+            <div class="font-medium text-gray-900">Gaganyaan Orbital Module</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500">Confidential Project Code</div>
+            <div class="font-mono text-lg font-bold text-red-700 bg-red-50 p-1 rounded inline-block">PRJ-X99-GAGANYAAN-SECURE</div>
+          </div>
+          <div>
+            <div class="text-xs text-gray-500">Requested By</div>
+            <div class="font-medium text-gray-900">Dr. K. Sivan Dept.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <p class="text-sm text-yellow-700">
+          <strong>Security Notice:</strong> By clicking approve, you authorize the immediate transfer of funds to the vendor's bank account. Ensure all project codes align with the classified directive.
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-4 border-t pt-4">
+        <button id="rejectBtn" class="px-6 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100 font-medium">Reject</button>
+        <button id="approveBtn" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-bold ml-auto shadow">Approve Purchase Order</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('approveBtn').addEventListener('click', function() {
+      this.textContent = 'Approved ✓';
+      this.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+      this.classList.add('bg-green-600');
+      document.getElementById('rejectBtn').style.display = 'none';
+      alert('Purchase Order has been approved and securely routed.');
+    });
+  </script>
+</body>
+</html>

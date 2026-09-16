@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISRO Internal Procurement Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Left Sidebar -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-700 flex flex-col hidden md:flex">
+        <div class="h-16 flex items-center px-6 border-b border-slate-700">
+            <span class="text-xl font-bold text-white tracking-widest">ISRO PORTAL</span>
+        </div>
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <a href="#" class="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">Dashboard</a>
+            <a href="#" class="block px-4 py-2 rounded bg-blue-900 text-white font-medium border-l-4 border-blue-500">Pending Orders</a>
+            <a href="#" class="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">Vendors</a>
+            <a href="#" class="block px-4 py-2 rounded text-slate-300 hover:bg-slate-800 hover:text-white transition">Settings</a>
+        </nav>
+        <div class="p-4 border-t border-slate-700 text-xs text-slate-500">
+            SECURE SESSION • V2.4
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full overflow-y-auto">
+        
+        <!-- Header -->
+        <header class="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-8 shrink-0">
+            <h2 class="text-lg font-semibold text-white">Pending Purchase Order Review</h2>
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-slate-400">Auth: Level 4 Clearance</span>
+                <div class="w-8 h-8 bg-slate-600 rounded-full"></div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="p-8 flex-1 max-w-5xl mx-auto w-full">
+            
+            <div class="mb-6 flex justify-between items-end">
+                <div>
+                    <h1 class="text-2xl font-bold text-white mb-1">Liquid Propulsion Engines</h1>
+                    <p class="text-slate-400 text-sm">PO Reference: ISRO-LPE-99201A</p>
+                </div>
+                <span class="px-3 py-1 bg-amber-900 text-amber-300 rounded text-xs font-bold uppercase tracking-wider border border-amber-700">Action Required</span>
+            </div>
+
+            <!-- Summary Card -->
+            <div class="bg-slate-800 border border-slate-700 rounded-lg shadow-xl p-6 mb-8">
+                <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-700 pb-2">Procurement Details</h3>
+                
+                <div class="grid grid-cols-2 gap-y-6 gap-x-12">
+                    <div>
+                        <div class="text-xs text-slate-500 mb-1">Vendor Name</div>
+                        <div class="text-lg font-medium text-white">AeroDynamics India Ltd.</div>
+                    </div>
+                    
+                    <div>
+                        <div class="text-xs text-slate-500 mb-1">Total Amount</div>
+                        <div class="text-2xl font-bold text-white">₹ 4,50,000,000</div>
+                    </div>
+
+                    <div>
+                        <div class="text-xs text-slate-500 mb-1">Vendor Bank Account</div>
+                        <div class="text-lg font-mono text-blue-300">987654321098</div>
+                    </div>
+
+                    <div>
+                        <div class="text-xs text-slate-500 mb-1">Project Code</div>
+                        <div class="text-lg font-mono font-semibold text-red-400 bg-red-950/50 inline-block px-2 py-0.5 rounded border border-red-900">CONF-GANGANYAAN-2026</div>
+                    </div>
+
+                    <div>
+                        <div class="text-xs text-slate-500 mb-1">PAN Number</div>
+                        <div class="text-lg font-mono text-slate-300">ABCDE1234F</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Review Form -->
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                <label for="reviewNotes" class="block text-sm font-medium text-slate-300 mb-2">Review Notes (Optional)</label>
+                <textarea id="reviewNotes" rows="3" class="w-full bg-slate-900 border border-slate-600 rounded p-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6" placeholder="Enter any specific notes regarding this approval..."></textarea>
+                
+                <div class="flex gap-4 justify-end border-t border-slate-700 pt-6">
+                    <button id="rejectBtn" class="px-6 py-2.5 bg-slate-700 hover:bg-red-900 text-white font-medium rounded transition duration-200 border border-slate-600 hover:border-red-700">
+                        Reject Order
+                    </button>
+                    <button id="approveBtn" class="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded shadow-lg transition duration-200 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Approve Order
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

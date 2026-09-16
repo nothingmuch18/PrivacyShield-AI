@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HR KYC Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  
+  <header class="bg-white shadow p-4 mb-8">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <div class="text-xl font-bold text-gray-800">HR KYC Portal</div>
+      <div class="text-sm text-gray-500">Employee Verification Queue</div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold border-b pb-2 mb-4">Review Document: Aadhaar Card</h2>
+      
+      <div class="flex gap-8 mb-6">
+        
+        <!-- Document Image -->
+        <div class="w-1/2 border rounded p-2 bg-gray-50 flex items-center justify-center relative">
+          <!-- Fake ID Card -->
+          <div class="w-full h-64 bg-white border shadow-sm rounded p-4 relative" id="idCard">
+            <div class="flex justify-between items-start border-b pb-2 mb-4">
+              <div class="font-bold text-sm text-blue-800">Government of India</div>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem" class="w-8 h-8 opacity-50">
+            </div>
+            <div class="flex gap-4">
+              <img id="faceImage" src="id_photo.jpg" alt="Face" class="w-24 h-24 object-cover border-2 border-gray-300 rounded shadow-inner">
+              <div class="text-sm">
+                <div class="font-bold text-gray-800 mb-1">Rohan Sharma</div>
+                <div class="text-gray-600 mb-1">DOB: <span class="font-bold">12/05/1990</span></div>
+                <div class="text-gray-600">Gender: Male</div>
+              </div>
+            </div>
+            <div class="absolute bottom-4 left-0 w-full text-center">
+              <div class="text-2xl font-mono font-bold tracking-widest text-gray-900">4567 8901 2345</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Form -->
+        <div class="w-1/2 space-y-4">
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">Extracted Name</label>
+            <input type="text" value="Rohan Sharma" class="w-full border rounded p-2 bg-gray-50" readonly>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-600 mb-1">Verification Status</label>
+            <select class="w-full border rounded p-2">
+              <option>Pending</option>
+              <option>Approved</option>
+              <option>Rejected</option>
+            </select>
+          </div>
+          
+          <div class="pt-4 border-t mt-4 flex justify-end gap-2">
+            <button class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Flag for Manual Review</button>
+            <button id="verifyBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Verify & Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <script>
+    document.getElementById('verifyBtn').addEventListener('click', function() {
+      this.textContent = 'Verified';
+      this.classList.remove('bg-blue-600');
+      this.classList.add('bg-green-600');
+      alert('Document verified. Moving to next item.');
+      window.scrollTo(0, document.body.scrollHeight);
+    });
+  </script>
+</body>
+</html>

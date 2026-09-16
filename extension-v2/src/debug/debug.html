@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PrivacyShield AI — Cloud Gateway Debugger</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Hacker/Terminal Theme */
+    body {
+      background-color: #0d1117;
+      color: #c9d1d9;
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background-color: #161b22;
+      border-bottom: 1px solid #30363d;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pulse {
+      width: 10px;
+      height: 10px;
+      background-color: #238636;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #2ea043;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(46, 160, 67, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(46, 160, 67, 0); }
+    }
+    .main-container {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .panel {
+      flex: 1;
+      border-right: 1px solid #30363d;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .panel-header {
+      background-color: #21262d;
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      justify-content: space-between;
+    }
+    .panel-content {
+      flex: 1;
+      overflow: auto;
+      padding: 1rem;
+    }
+    #imagePreview {
+      max-width: 100%;
+      border: 1px solid #30363d;
+      background-color: #000;
+    }
+    pre {
+      margin: 0;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: #79c0ff;
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="header">
+    <div class="flex items-center gap-3">
+      <div class="pulse" id="statusPulse"></div>
+      <h1 class="text-xl font-bold text-white">Cloud Gateway Debugger</h1>
+    </div>
+    <div class="text-sm text-gray-400">
+      Intercepting payloads before network...
+    </div>
+  </div>
+
+  <div class="main-container">
+    
+    <!-- Left Panel: Redacted Screenshot -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>Redacted Screenshot Payload</span>
+        <span class="text-xs text-green-400" id="imgSize">0 KB</span>
+      </div>
+      <div class="panel-content flex items-center justify-center bg-[#010409]">
+        <img id="imagePreview" src="" alt="Waiting for screenshot..." style="display: none;">
+        <div id="imageWaiting" class="text-gray-500 animate-pulse">Awaiting Pipeline Execution...</div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Sanitized DOM JSON -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>Sanitized DOM Payload (JSON)</span>
+        <span class="text-xs text-green-400" id="jsonSize">0 KB</span>
+      </div>
+      <div class="panel-content">
+        <div id="jsonWaiting" class="text-gray-500 animate-pulse">Awaiting Pipeline Execution...</div>
+        <pre id="jsonPreview" style="display: none;"></pre>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="debug.js"></script>
+</body>
+</html>
+

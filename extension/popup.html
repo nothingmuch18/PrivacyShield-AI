@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PrivacyShield AI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="logo-section">
+        <span class="logo-icon">🛡️</span>
+        <h1 class="logo-text">PrivacyShield <span class="logo-accent">AI</span></h1>
+      </div>
+      <div class="version-badge">v1.0</div>
+    </div>
+
+    <!-- Status Section -->
+    <div class="status-section">
+      <div class="status-indicator">
+        <span class="status-dot" id="statusDot"></span>
+        <span class="status-text" id="statusText">Inactive</span>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="toggleSwitch">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <!-- Sound Setting -->
+    <div class="status-section" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05);">
+      <div class="status-indicator">
+        <span class="status-text" style="color: #94a3b8;">🔊 Sound Effects</span>
+      </div>
+      <label class="toggle-switch" style="transform: scale(0.85); transform-origin: right center;">
+        <input type="checkbox" id="soundSwitch" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <!-- On-Screen Borders Setting -->
+    <div class="status-section" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05);">
+      <div class="status-indicator">
+        <span class="status-text" style="color: #94a3b8;">👁️ On-Screen Borders</span>
+      </div>
+      <label class="toggle-switch" style="transform: scale(0.85); transform-origin: right center;">
+        <input type="checkbox" id="overlaySwitch">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <!-- Task Input -->
+    <div class="task-section" id="taskSection">
+      <label class="task-label" for="taskInput">🎯 Your Task</label>
+      <div class="task-input-wrapper">
+        <input type="text" id="taskInput" class="task-input" 
+               placeholder="e.g., Fill out this form...">
+        <button class="task-submit" id="taskSubmit" title="Set task">→</button>
+      </div>
+      <div class="active-task" id="activeTask" style="display:none;">
+        <span class="active-task-label">Active:</span>
+        <span class="active-task-text" id="activeTaskText"></span>
+        <button class="task-clear" id="taskClear" title="Clear task">✕</button>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats" id="quickStats">
+      <div class="stat-item">
+        <span class="stat-icon">👁️</span>
+        <span class="stat-value" id="statDetected">0</span>
+        <span class="stat-label">Detected</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">🛡️</span>
+        <span class="stat-value" id="statProtected">0</span>
+        <span class="stat-label">Protected</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">⚡</span>
+        <span class="stat-value" id="statLatency">--</span>
+        <span class="stat-label">ms</span>
+      </div>
+    </div>
+
+    <!-- Side Panel Button -->
+    <button class="open-dashboard-btn" id="openDashboard">
+      <span>📊</span> Open Dashboard
+    </button>
+
+    <!-- Footer -->
+    <div class="popup-footer">
+      <span class="footer-badge">On-Device AI</span>
+      <span class="footer-dot">•</span>
+      <span class="footer-badge">Privacy-First</span>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
