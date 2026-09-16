@@ -91,12 +91,31 @@ export class AgentController {
         throw new Error(`Server returned ${response.status}: ${response.statusText}`);
       }
 
-      const data: AnalyzeResponse = await response.json();
+      const data: any = await response.json();
       const cloudLatencyMs = Math.round(performance.now() - startTime);
       console.log(`[VisionLite:Agent] AI Response in ${cloudLatencyMs}ms:`, data);
 
-      this.broadcastState(task, 'executing', data.understanding, `Will ${data.action.action} ${data.action.target || ''}`, undefined, { cloudLatencyMs });
-      return data;
+      // Normalize action format (support both server 'type' and client 'action')
+      if (data && data.action) {
+        if (!data.action.action && data.action.type) {
+          data.action.action = data.action.type;
+        }
+      } else if (data && !data.action) {
+        data.action = { action: 'wait', value: '1000', description: data.understanding || 'Waiting for next cycle' };
+      }
+
+      const actionName = data.action?.action || 'wait';
+      const targetName = data.action?.target || '';
+
+      this.broadcastState(
+        task,
+        'executing',
+        data.understanding || 'Agent reasoned next step',
+        `Will ${actionName} ${targetName}`.trim(),
+        undefined,
+        { cloudLatencyMs }
+      );
+      return data as AnalyzeResponse;
     } catch (error: any) {
       console.error('[VisionLite:Agent] Analysis failed:', error);
       this.broadcastState(task, 'error', undefined, undefined, error.message);

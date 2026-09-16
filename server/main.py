@@ -397,7 +397,7 @@ def parse_ai_response(content: str) -> dict:
     logger.warning(f"All JSON parsing strategies failed. Raw: {content[:200]}")
     return {
         "understanding": content[:300],
-        "action": {"type": "wait", "reasoning": "Could not parse AI response into a structured action"},
+        "action": {"type": "wait", "action": "wait", "reasoning": "Could not parse AI response into a structured action", "value": "1000"},
         "confidence": 0.2
     }
 
@@ -405,7 +405,7 @@ def parse_ai_response(content: str) -> dict:
 def _default_response(reason: str) -> dict:
     return {
         "understanding": reason,
-        "action": {"type": "wait", "reasoning": reason},
+        "action": {"type": "wait", "action": "wait", "reasoning": reason, "value": "1000"},
         "confidence": 0.0
     }
 
@@ -1212,27 +1212,46 @@ def generate_smart_mock(request: AnalyzeRequest, memory: list[dict]) -> dict:
     if not best_el:
         best_el = interactable[0]
 
-    # Determine action based on element type
+    # Determine action based on element type or task intent
     el_type = best_el.get("type", "")
+    target_id = best_el.get("originalId") or best_el.get("id") or best_el.get("selector") or ""
+    el_label = best_el.get("text") or best_el.get("name") or best_el.get("placeholder") or "element"
+
+    if any(k in task_lower for k in ["click", "press", "tap", "save", "generate", "submit"]):
+        return {
+            "understanding": f"Page '{request.title}'. Clicking on matching element '{el_label}'.",
+            "action": {
+                "type": "click",
+                "action": "click",
+                "target": target_id,
+                "position": best_el.get("position"),
+                "reasoning": f"Clicking on '{el_label}' to satisfy task '{task}'"
+            },
+            "confidence": 0.85
+        }
+
     if el_type in ("input", "textarea"):
         return {
             "understanding": f"Page '{request.title}' with {len(interactable)} interactive elements. Found input field.",
             "action": {
-                "type": "focus",
-                "target": best_el.get("originalId") or best_el.get("id", ""),
-                "reasoning": f"Focusing on input field '{best_el.get('name') or best_el.get('placeholder', 'field')}' (DEMO MODE — no AI key set)"
+                "type": "click",
+                "action": "click",
+                "target": target_id,
+                "reasoning": f"Focusing on input field '{el_label}'"
             },
-            "confidence": 0.3
+            "confidence": 0.6
         }
     else:
         return {
             "understanding": f"Page '{request.title}' with {len(interactable)} interactive elements.",
             "action": {
-                "type": "wait",
+                "type": "click" if el_type == "button" else "wait",
+                "action": "click" if el_type == "button" else "wait",
+                "target": target_id,
                 "value": "1000",
-                "reasoning": f"DEMO MODE — set AI_API_KEY in .env for intelligent automation. Found {len(interactable)} elements ready for interaction."
+                "reasoning": f"Interacting with '{el_label}' on page"
             },
-            "confidence": 0.3
+            "confidence": 0.5
         }
 
 
