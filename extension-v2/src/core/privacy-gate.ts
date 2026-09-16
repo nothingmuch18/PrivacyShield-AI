@@ -29,9 +29,9 @@ const OUTBOUND_PII_PATTERNS: Array<{ type: string; pattern: RegExp }> = [
   { type: 'EMAIL', pattern: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g },
   { type: 'PHONE_IN', pattern: /\+?91[\s-]?\d{5}[\s-]?\d{5}\b/g },
 
-  // Auth secrets
+  // Auth secrets - format requires typical delimiters (hyphen/underscore) or uppercase tokens
   { type: 'JWT', pattern: /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/g },
-  { type: 'API_KEY', pattern: /\b(sk|pk|gsk|ghp|glpat|xox[bpas]|AKIA|AIza)[A-Za-z0-9_-]{10,}\b/g },
+  { type: 'API_KEY', pattern: /\b(?:sk-[A-Za-z0-9_-]{20,}|pk-[A-Za-z0-9_-]{20,}|gsk_[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{20,}|glpat-[A-Za-z0-9_-]{20,}|xox[bpas]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z-_]{35})\b/g },
   { type: 'BEARER_TOKEN', pattern: /Bearer\s+[A-Za-z0-9_.-]{20,}/gi },
 ];
 
@@ -87,7 +87,10 @@ export class PrivacyGate {
     const violations: PrivacyGateResult['violations'] = [];
 
     // Serialize the entire payload to a flat string for scanning
-    const serialized = typeof payload === 'string' ? payload : JSON.stringify(payload);
+    let serialized = typeof payload === 'string' ? payload : JSON.stringify(payload);
+
+    // Strip base64 image payloads (they are visually redacted by Canvas and contain random base64 byte sequences)
+    serialized = serialized.replace(/data:image\/[a-zA-Z]+;base64,[A-Za-z0-9+/=]+/g, '"[REDACTED_IMAGE_BASE64]"');
 
     // Remove known-safe tokens before scanning
     let cleanedForScan = serialized;
