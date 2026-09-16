@@ -264,14 +264,37 @@ if (!(window as any).__VisionLiteV2) {
   }
 
   /**
-   * Find an element by CSS selector, with fallback strategies.
+   * Find an element by CSS selector, with robust fallback strategies.
    */
   function findElement(selector: string): HTMLElement | null {
+    if (!selector) return null;
+
+    // Strategy 1: Standard querySelector
     try {
-      return document.querySelector(selector);
+      const el = document.querySelector(selector);
+      if (el) return el as HTMLElement;
     } catch {
-      return null;
+      // Invalid selector string, try fallbacks
     }
+
+    // Strategy 2: ID match (with or without #)
+    const cleanId = selector.startsWith('#') ? selector.slice(1) : selector;
+    const byId = document.getElementById(cleanId);
+    if (byId) return byId;
+
+    // Strategy 3: Name or placeholder match
+    const byName = document.querySelector(`[name="${selector}"], [placeholder="${selector}" i]`);
+    if (byName) return byName as HTMLElement;
+
+    // Strategy 4: Button / link / input visible text match
+    const buttonsAndLinks = Array.from(document.querySelectorAll('button, a, input[type="submit"], input[type="button"]')) as HTMLElement[];
+    const match = buttonsAndLinks.find(el => {
+      const text = (el.innerText || (el as HTMLInputElement).value || '').trim().toLowerCase();
+      return text && (text === selector.toLowerCase() || text.includes(selector.toLowerCase()));
+    });
+    if (match) return match;
+
+    return null;
   }
 
   function sleep(ms: number): Promise<void> {

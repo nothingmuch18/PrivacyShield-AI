@@ -83,6 +83,31 @@ taskClear.addEventListener('click', () => {
   chrome.runtime.sendMessage(msg);
 });
 
+// Open Side Panel Dashboard
+const openSidepanelBtn = $('openSidepanelBtn');
+if (openSidepanelBtn) {
+  openSidepanelBtn.addEventListener('click', async () => {
+    try {
+      const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (currentTab?.windowId) {
+        await (chrome as any).sidePanel.open({ windowId: currentTab.windowId });
+        window.close();
+      }
+    } catch {
+      // Fallback if sidePanel.open is not permitted directly: open tab
+      chrome.tabs.create({ url: chrome.runtime.getURL('sidepanel/sidepanel.html') });
+    }
+  });
+}
+
+// Open Privacy Inspector Split View
+const openDebugBtn = $('openDebugBtn');
+if (openDebugBtn) {
+  openDebugBtn.addEventListener('click', () => {
+    chrome.tabs.create({ url: chrome.runtime.getURL('debug/debug.html') });
+  });
+}
+
 // ════════════════════════════════════════════════════════════════
 //  MESSAGE LISTENER (stats from background)
 // ════════════════════════════════════════════════════════════════
