@@ -16,6 +16,8 @@ interface AnalyzePayload {
   redacted_screenshot: string;
   page_structure: DOMSnapshot;
   task: string;
+  url?: string;
+  title?: string;
 }
 
 interface AnalyzeResponse {
@@ -54,6 +56,8 @@ export class AgentController {
         task,
         redacted_screenshot: redactedScreenshot,
         page_structure: domSnapshot,
+        url: domSnapshot.url,
+        title: domSnapshot.title,
       };
 
       // ── PRIVACY GATE (Fail-Closed Outbound Firewall) ──

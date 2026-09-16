@@ -252,7 +252,14 @@ def preprocess_action(request: AnalyzeRequest, memory: list[dict]) -> Optional[d
     """
     task = (request.task or "").lower()
     elements = request.page_structure.get("elements", [])
-    interactable = [e for e in elements if e.get("isInteractable")]
+    interactable = [
+        e for e in elements
+        if e.get("isInteractable")
+        or e.get("role") in ("button", "textbox", "link", "combobox", "checkbox")
+        or e.get("tag") in ("button", "input", "a", "select", "textarea")
+    ]
+    if not interactable:
+        interactable = elements
 
     # --- Anti-loop detection ---
     if len(memory) >= 3:
@@ -314,24 +321,27 @@ def preprocess_action(request: AnalyzeRequest, memory: list[dict]) -> Optional[d
                     "confidence": 0.7
                 }
 
-    # --- Submit shortcut ---
-    if any(keyword in task for keyword in ["submit", "click submit", "send", "apply"]):
+    # --- Submit & Click shortcut ---
+    if any(keyword in task for keyword in ["submit", "click", "save", "generate", "otp", "send", "apply"]):
         submit_btns = [
             e for e in interactable
-            if (e.get("type") == "button" or e.get("inputType") == "submit")
-            and any(k in (e.get("text") or "").lower() for k in ["submit", "send", "apply", "register", "sign up"])
+            if (e.get("type") in ("button", "a") or e.get("inputType") in ("submit", "button"))
+            and any(k in (e.get("text") or e.get("name") or e.get("id") or "").lower() for k in ["submit", "save", "generate", "otp", "send", "apply", "register", "sign up"])
         ]
         if submit_btns:
             btn = submit_btns[0]
+            target_id = btn.get("originalId") or btn.get("id") or btn.get("selector") or ""
+            btn_text = btn.get("text") or btn.get("name") or "Button"
             return {
-                "understanding": f"Found submit button: '{btn.get('text', 'Submit')}'",
+                "understanding": f"Found target button: '{btn_text}'",
                 "action": {
                     "type": "click",
-                    "target": btn.get("originalId") or btn.get("id", ""),
+                    "action": "click",
+                    "target": target_id,
                     "position": btn.get("position"),
-                    "reasoning": f"Clicking the submit button to complete the form"
+                    "reasoning": f"Clicking on '{btn_text}' to complete the requested task"
                 },
-                "confidence": 0.75
+                "confidence": 0.9
             }
 
     return None  # Defer to VLM
@@ -503,7 +513,13 @@ async def analyze(request: AnalyzeRequest):
         await asyncio.sleep(wait_time)
     LAST_REQUEST_TIME = time.time()
 
-    logger.info(f"Analyze: url={request.url}, task={request.task}")
+    # Populate url and title from page_structure if top-level is empty
+    if not request.url and isinstance(request.page_structure, dict):
+        request.url = request.page_structure.get("url", "")
+    if not request.title and isinstance(request.page_structure, dict):
+        request.title = request.page_structure.get("title", "")
+
+    logger.info(f"Analyze: url={request.url}, task={request.task}, elements={len(request.page_structure.get('elements', [])) if isinstance(request.page_structure, dict) else 0}")
 
     # Use empty memory for REST requests (no persistent connection)
     memory = []
@@ -516,7 +532,8 @@ async def analyze(request: AnalyzeRequest):
             return pre_result
 
         # Call AI
-        if AI_PROVIDER == "groq" and AI_API_KEY:
+        has_real_key = bool(AI_API_KEY and not AI_API_KEY.startswith("your_"))
+        if AI_PROVIDER == "groq" and has_real_key:
             result = await call_groq(request, memory)
         elif AI_PROVIDER == "ollama":
             result = await call_ollama(request, memory)
@@ -1127,9 +1144,9 @@ async def call_groq(request: AnalyzeRequest, memory: list[dict]) -> dict:
                 response = await client.post(GROQ_API_URL, headers=headers, json=payload)
                 response.raise_for_status()
             except Exception as fallback_e:
-                logger.error(f"Text fallback also failed: {fallback_e}")
+                logger.warning(f"Groq API call failed ({fallback_e}). Falling back to smart on-device planner.")
                 pre = preprocess_action(request, memory)
-                return pre if pre else _default_response("AI service unavailable")
+                return pre if pre else generate_smart_mock(request, memory)
 
         result = response.json()
         content = result["choices"][0]["message"]["content"]
@@ -1179,7 +1196,14 @@ def generate_smart_mock(request: AnalyzeRequest, memory: list[dict]) -> dict:
     Uses rule-based analysis of the page structure.
     """
     elements = request.page_structure.get("elements", [])
-    interactable = [e for e in elements if e.get("isInteractable")]
+    interactable = [
+        e for e in elements
+        if e.get("isInteractable")
+        or e.get("role") in ("button", "textbox", "link", "combobox", "checkbox")
+        or e.get("tag") in ("button", "input", "a", "select", "textarea")
+    ]
+    if not interactable:
+        interactable = elements
     task = request.task or ""
 
     # Try the pre-processor first
@@ -1201,13 +1225,22 @@ def generate_smart_mock(request: AnalyzeRequest, memory: list[dict]) -> dict:
 
     # Find the most relevant interactable element based on the task
     task_lower = task.lower()
+    task_words = [w for w in re.findall(r'\w+', task_lower) if w not in ("the", "a", "an", "on", "in", "to", "and", "please")]
     best_el = None
 
+    # Pass 1: exact substring match
     for el in interactable:
-        el_text = (el.get("text") or el.get("name") or el.get("placeholder") or "").lower()
-        if el_text and el_text in task_lower:
+        el_text = (el.get("text") or el.get("name") or el.get("placeholder") or el.get("id") or "").lower()
+        if el_text and (el_text in task_lower or any(w in el_text for w in task_words)):
             best_el = el
             break
+
+    # Pass 2: button or submit element fallback if task contains click/save/submit
+    if not best_el and any(k in task_lower for k in ["click", "save", "submit", "generate", "press"]):
+        for el in interactable:
+            if el.get("type") in ("button", "a") or el.get("inputType") in ("submit", "button"):
+                best_el = el
+                break
 
     if not best_el:
         best_el = interactable[0]
